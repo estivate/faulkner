@@ -1,95 +1,127 @@
 # Faulkner
 
-A simple and flexible logging solution for Go programs. It's focused on:
+A small and easy-to-use logging module for Go programs. It's focused on:
 
-* Simplicity ~ new team members can easily use it w/o reading anything
-* Consistent ~ all your apps can log the same way
+* Simplicity ~ easily use it w/o having to add stuff to your brain
+* Consistent ~ maintain all your logs with the same tools & bash thingies
 
-## Features
+It's basically a thin wrapper over Go's `log` package that enables a few
+additional things that I find useful:
 
-Faulkner is a thin wrapper over Go's `log` package. It enables a few cool things
-in a pretty simple way:
+* Three types of messages: ERROR, INFO and DEBUG
+* Easily disable DEBUG (and INFO) messages for live deployments
+* ERROR highlighted in red in console (automatically disabled for Windows)
+* All messages include date and time
+* ERROR messages also include file and line number
+* Print simple "banner" messages (for instance, special info at startup)
 
-* INFO & Error messages always appear in logs
-* DEBUG messages can be toggled on/off
-* Errors highlighted with Red typed prefix
-* Errors include file and line number
-* Outputs to Stderr, a log file, or any other io.Writer
-* Print "banners" to find start, stop or other special events in logs
+It logs to Stderr by default, but you can configure it to log to a file
+or any other io.Writer. Personally I find it useful to just log to Stderr
+for development and let folks deploying the app decide where to pipe the
+logs. This way we don't need a new binary when those locations change.
 
 ## STATUS
 
-Early version, stay tuned. Only tested on Linux.
+Early version, stay tuned. The API is still changing so if you use it
+lock to a version. Only tested on Linux.
+
+## Installation
+
+```go
+go get github.com/estivate/faulkner@latest
+```
 
 ## QUICK START
-
-The simpliest way to use is to embrace the defaults. By default all logging will print to Stderr
-and all messages (including DEBUG) will print.
 
 ```go
 package main
 
 import (
-    "fmt"
-    "github.com/estivate/faulkner"
+	"fmt"
+	"github.com/estivate/faulkner"
 )
 
 func main() {
-    app_version := "1.10.4"
-    port_number := ":80"
-    logger, _ := faulkner.NewLogger()
 
-    message := fmt.Sprintf("Starting MyApp, version %s.", app_version)
-    logger.PrintBanner(message)
-    logger.Debug.Printf("Debugging about port %s.", port_number)
-    logger.Info.Printf("Info message about port %s.", port_number)
-    logger.Error.Printf("Error message thrown regarding port %s.", port_number)
+	// let's make this interesting with some fake data
+	app_version := "1.10.4"
+	debug_mode_enabled := true
+	var_thing := "user did this, for reals"
+
+	// create a default logger
+	logger := faulkner.DefaultLogger()
+
+	// format a startup message
+	message := fmt.Sprintf("Starting MyApp, version %s.", app_version)
+	if debug_mode_enabled {
+		message += "\nRunning in Debug Mode"
+	}
+	logger.PrintBanner(message)
+	logger.Debug.Printf("Can you believe a debugging %s.", var_thing)
+	logger.Info.Println("Just a normal thing is happening.")
+	logger.Error.Printf("Alert! An unexpected %s.", var_thing)
+
+	// turn off DEBUG messages
+	logger.DebugOff()
+	logger.Debug.Println("This line won't print now.")
+
+	// turn off INFO messages
+	logger.InfoOff()
+	logger.Debug.Println("This line still won't print.")
+	logger.Info.Println("This line won't print now.")
+	logger.Error.Println("This is all that shows up!")
+
 }
 ```
-
 If you run the above your output will look something like this:
 
 ```bash
 >> go run main.go
 --------------------------
-Starting MyApp, version 1.10.4
+Starting MyApp, version 1.10.4.
+Running in Debug Mode
 --------------------------
-DEBUG: 2021/04/30 17:15:22 Debugging about port :80.
-INFO: 2021/04/30 17:15:22 Info message about port :80.
-ERROR: 2021/04/30 17:15:22 main.go:12: Error message thrown regarding port :80.
+DEBUG: 2021/05/01 08:35:43 example.go:25: Can you believe a debugging user did this, for reals.
+INFO:  2021/05/01 08:35:43 Just a normal thing is happening.
+ERROR: 2021/05/01 08:35:43 example.go:27: Alert! A unexpected user did this, for reals.
+ERROR: 2021/05/01 08:35:43 example.go:37: This is all that shows up!
 ```
-The word "ERROR" will be red in the output above.
+The words "ERROR" will be red in the output above.
 
-If you'd like to toggle DEBUG messages on/off you can pass a bool value to the `SetDebug()` option:
+## Advanced Usage
+
+In most cases you should probably just fork this repo and modify the defaults so you can keep things
+simple and just use the above code too. However, there are some things I occassionally have to do
+(like logging to a file or service), and it's not too hard.
+
+Instead of calling `DefaultLogger()` you can call `NewLogger()` and pass it 
+[functional options](https://dave.cheney.net/2014/10/17/functional-options-for-friendly-apis)
+as needed.
 
 ```go
+
+// toggle debug messages
 ourDebugState = false
 logger, _ := faulkner.NewLogger(faulkner.SetDebug(ourDebugState))
 logger.Debug.Printf("This message won't appear in log.")
-```
 
-If you'd like to write to a log file instead of Stderr you can provide a file path to the `SetFile()` option:
-
-```go
+// log to a file
 logger, err := faulkner.NewLogger(faulkner.SetFile("/path/to/logfile.txt"))
 if err != nil {
     fmt.Printf("Log file can't be written to: %v" err)
 }
-```
 
-Note that we are checking the error value here. Default usage or toggling Debug will never error,
-but specifying a log file can error if permissions are wrong, etc.
-
-Finally, you can set multiple options:
-
-```go
+// pass in multiple options
 debug_toggle := faulkner.SetDebug(false)
+info_toggle := faulkner.SetInfo(false)
 log_file := faulkner.SetFile("/path/to/logfile.txt")
-logger, err := faulkner.NewLogger(debug_toggle, log_file)
+logger, err := faulkner.NewLogger(debug_toggle, info_toggle, log_file)
 if err != nil {
     fmt.Printf("Log file can't be written to: %v" err)
 }
+
 ```
+Note that `NewLogger()` can return an error, and in most cases you'll want to check for it.
 
 In the above examples, `logger.Info`, `logger.Debug` and `logger.Error` are instances of
 Go's own `*log.Logger` so you can call any method you would on a regular

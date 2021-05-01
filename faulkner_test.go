@@ -8,14 +8,14 @@ import (
 
 // Test logger creation, option passing and banner printing
 func TestBanner(t *testing.T) {
-	wants := "\n--------------------------\nTest\n--------------------------\n"
+	wants := "--------------------------\nTest\n--------------------------\n"
 	message := "Test"
 	var buf bytes.Buffer
 	log_buffer := SetBuffer(&buf)
 	logger, _ := NewLogger(log_buffer)
 	logger.PrintBanner(message)
 	if buf.String() != wants {
-		t.Errorf("Banner wants message, got %v", buf.String())
+		t.Errorf("Banner wants %s, got %v", wants, buf.String())
 	}
 }
 

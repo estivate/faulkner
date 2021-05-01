@@ -65,7 +65,7 @@ If you'd like to toggle DEBUG messages on/off you can pass a bool value to the `
 ```go
     ourDebugState = false
     logger, _ := faulkner.NewLogger(faulkner.SetDebug(ourDebugState))
-	logger.LogDebug.Printf("This message won't appear in log.")
+	logger.Debug.Printf("This message won't appear in log.")
 ```
 
 If you'd like to write to a log file instead of Stderr you can provide a file path to the `SetFile()` option:

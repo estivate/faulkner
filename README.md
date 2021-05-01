@@ -63,18 +63,18 @@ The word "ERROR" will be red in the output above.
 If you'd like to toggle DEBUG messages on/off you can pass a bool value to the `SetDebug()` option:
 
 ```go
-    ourDebugState = false
-    logger, _ := faulkner.NewLogger(faulkner.SetDebug(ourDebugState))
-	logger.Debug.Printf("This message won't appear in log.")
+ourDebugState = false
+logger, _ := faulkner.NewLogger(faulkner.SetDebug(ourDebugState))
+logger.Debug.Printf("This message won't appear in log.")
 ```
 
 If you'd like to write to a log file instead of Stderr you can provide a file path to the `SetFile()` option:
 
 ```go
-    logger, err := faulkner.NewLogger(faulkner.SetFile("/path/to/logfile.txt"))
-    if err != nil {
-        fmt.Printf("Log file can't be written to: %v" err)
-    }
+logger, err := faulkner.NewLogger(faulkner.SetFile("/path/to/logfile.txt"))
+if err != nil {
+    fmt.Printf("Log file can't be written to: %v" err)
+}
 ```
 
 Note that we are checking the error value here. Default usage or toggling Debug will never error,
@@ -83,11 +83,14 @@ but specifying a log file can error if permissions are wrong, etc.
 Finally, you can set multiple options:
 
 ```go
-    debug_toggle := faulkner.SetDebug(false)
-    log_file := faulkner.SetFile("/path/to/logfile.txt")
-    logger, err := faulkner.NewLogger(debug_toggle, log_file)
-    if err != nil {
-        fmt.Printf("Log file can't be written to: %v" err)
-    }
+debug_toggle := faulkner.SetDebug(false)
+log_file := faulkner.SetFile("/path/to/logfile.txt")
+logger, err := faulkner.NewLogger(debug_toggle, log_file)
+if err != nil {
+    fmt.Printf("Log file can't be written to: %v" err)
+}
 ```
 
+In the above examples, `logger.Info`, `logger.Debug` and `logger.Error` are instances of
+Go's own `*log.Logger` so you can call any method you would on a regular
+Go Logger (see [Go Docs](https://golang.org/pkg/log/)).

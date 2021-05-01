@@ -2,8 +2,8 @@
 
 A small and easy-to-use logging module for Go programs. It's focused on:
 
-* Simplicity ~ easily use it w/o having to add stuff to your brain
-* Consistent ~ maintain all your logs with the same tools & bash thingies
+* Simplicity ~ easily for devs to use w/o taking up space in brains
+* Consistent ~ various app logs can all look the same for sys admins
 
 It's basically a thin wrapper over Go's `log` package that enables a few
 additional things that I find useful:
@@ -17,8 +17,18 @@ additional things that I find useful:
 
 It logs to Stderr by default, but you can configure it to log to a file
 or any other io.Writer. Personally I find it useful to just log to Stderr
-for development and let folks deploying the app decide where to pipe the
-logs. This way we don't need a new binary when those locations change.
+and let folks deploying the app decide where to pipe the logs. This way 
+we don't need a new binary when those locations change.
+
+If you need fully featured, structured logging in Go check out 
+[Logrus](https://github.com/Sirupsen/logrus) or the tons of options
+on the logging section of
+[Awesome Go](https://github.com/avelino/awesome-go#logging).
+
+If you use Faulkner, you should likely plan to eventually fork it for
+your own team. Logging is core to every app you build, and there's 
+only a few good reasons to pull in 3rd party code to do it, especially
+if you are working in highly regulated industries.
 
 ## STATUS
 

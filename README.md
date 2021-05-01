@@ -1,17 +1,25 @@
 # Faulkner
 
-A simple and flexible logging solution for Go programs.
+A simple and flexible logging solution for Go programs. It's focused on:
+
+* Simplicity ~ new team members can easily use it w/o reading anything
+* Consistent ~ all your apps can log the same way
 
 ## Features
 
 Faulkner is a thin wrapper over Go's `log` package. It enables a few cool things
 in a pretty simple way:
 
-* log to Stderr or to a file (or any other io.Writer)
-* Offers DEBUG, INFO and ERROR log types
-* ERROR messages in red when using Stderr
-* ERROR messages include file name and line number
-* DEBUG messages can be toggled off for production
+* INFO & Error messages always appear in logs
+* DEBUG messages can be toggled on/off
+* Errors highlighted with Red typed prefix
+* Errors include file and line number
+* Outputs to Stderr, a log file, or any other io.Writer
+* Print "banners" to find start, stop or other special events in logs
+
+## STATUS
+
+Early version, stay tuned. Only tested on Linux.
 
 ## QUICK START
 
@@ -26,8 +34,10 @@ import (
 )
 
 func main() {
+    app_version := "1.10.4"
     logger, _ := faulkner.NewLogger()
 
+    logger.PrintBanner("App Name, version %s", app_version)
     logger.LogDebug.Printf("This is a debug log test.")
     logger.LogInfo.Printf("This is an info log test.")
     logger.LogError.Printf("This is an error log test.")
@@ -38,11 +48,14 @@ If you run the above your output will look something like this:
 
 ```bash
 >> go run main.go
+--------------------------
+App Name, version 1.10.4
+--------------------------
 DEBUG: 2021/04/30 17:15:22 This is a debug log test.
 INFO: 2021/04/30 17:15:22 This is an info log test.
 ERROR: 2021/04/30 17:15:22 main.go:12: This is an error log test.
 ```
-The word "Error" should be red in the output above.
+The word "ERROR" will be red in the output above.
 
 If you'd like to toggle DEBUG messages on/off you can pass a bool value to the `SetDebug()` option:
 
@@ -64,7 +77,7 @@ If you'd like to write to a log file instead of Stderr you can provide a file pa
 Note that we are checking the error value here. Default usage or toggling Debug will never error,
 but specifying a log file can error if permissions are wrong, etc.
 
-Finally, you can send multiple options:
+Finally, you can set multiple options:
 
 ```go
     debug_toggle := faulkner.SetDebug(false)
@@ -74,3 +87,4 @@ Finally, you can send multiple options:
         fmt.Printf("Log file can't be written to: %v" err)
     }
 ```
+

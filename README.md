@@ -85,7 +85,7 @@ func main() {
 ```
 If you run the above your output will look something like this:
 
-```bash
+```
 >> go run main.go
 --------------------------
 Starting MyApp, version 1.10.4.

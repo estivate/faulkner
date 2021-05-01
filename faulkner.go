@@ -87,7 +87,6 @@ func SetBuffer(buf *bytes.Buffer) func(s *LogOptions) error {
 }
 
 func (l *Logger) PrintBanner(message string) {
-	l.Banner.Println()
 	l.Banner.Println("--------------------------")
 	l.Banner.Println(message)
 	l.Banner.Println("--------------------------")

@@ -30,17 +30,20 @@ and all messages (including DEBUG) will print.
 package main
 
 import (
+    "fmt"
     "github.com/estivate/faulkner"
 )
 
 func main() {
     app_version := "1.10.4"
+    port_number := ":80"
     logger, _ := faulkner.NewLogger()
 
-    logger.PrintBanner("App Name, version %s", app_version)
-    logger.LogDebug.Printf("This is a debug log test.")
-    logger.LogInfo.Printf("This is an info log test.")
-    logger.LogError.Printf("This is an error log test.")
+    message := fmt.Sprintf("Starting MyApp, version %s.", app_version)
+    logger.PrintBanner(message)
+    logger.Debug.Printf("Debugging about port %s.", port_number)
+    logger.Info.Printf("Info message about port %s.", port_number)
+    logger.Error.Printf("Error message thrown regarding port %s.", port_number)
 }
 ```
 
@@ -49,11 +52,11 @@ If you run the above your output will look something like this:
 ```bash
 >> go run main.go
 --------------------------
-App Name, version 1.10.4
+Starting MyApp, version 1.10.4
 --------------------------
-DEBUG: 2021/04/30 17:15:22 This is a debug log test.
-INFO: 2021/04/30 17:15:22 This is an info log test.
-ERROR: 2021/04/30 17:15:22 main.go:12: This is an error log test.
+DEBUG: 2021/04/30 17:15:22 Debugging about port :80.
+INFO: 2021/04/30 17:15:22 Info message about port :80.
+ERROR: 2021/04/30 17:15:22 main.go:12: Error message thrown regarding port :80.
 ```
 The word "ERROR" will be red in the output above.
 
